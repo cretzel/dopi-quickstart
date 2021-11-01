@@ -1,0 +1,102 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: dopi-quickstart-backend
+  labels:
+    app: dopi-quickstart-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dopi-quickstart-backend
+  template:
+    metadata:
+      labels:
+        app: dopi-quickstart-backend
+    spec:
+      containers:
+      - name: dopi-quickstart-backend
+        image: cretzel/dopi-quickstart-backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+          - name: ADMIN_PASSWORD
+            value: admin
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: dopi-quickstart-backend
+spec:
+  selector:
+    app: dopi-quickstart-backend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: dopi-quickstart-backend-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api/quickstart
+            backend:
+              serviceName: dopi-quickstart-backend
+              servicePort: 80
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: dopi-quickstart-web
+  labels:
+    app: dopi-quickstart-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dopi-quickstart-web
+  template:
+    metadata:
+      labels:
+        app: dopi-quickstart-web
+    spec:
+      containers:
+      - name: dopi-quickstart-web
+        image: cretzel/dopi-quickstart-web:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: dopi-quickstart-web
+spec:
+  selector:
+    app: dopi-quickstart-web
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: dopi-quickstart-web-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /quickstart
+            backend:
+              serviceName: dopi-quickstart-web
+              servicePort: 80
+
+
+
+
